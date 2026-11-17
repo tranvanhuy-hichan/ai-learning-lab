@@ -1,0 +1,11 @@
+torch>=2.0
+torchvision>=0.15
+numpy
+pandas
+pyarrow
+scikit-learn
+matplotlib
+jupyter
+ipykernel
+# Transformer notebook only:
+transformers
