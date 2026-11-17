@@ -1,13 +1,10 @@
-.PHONY: install run test lint format demo-figure
+.PHONY: web test lint format
 
-install:
-	pip install -r requirements.txt -r requirements-dev.txt
+web:            ## run the web app at http://127.0.0.1:8000
+	cd projects/lab-web && python -m labweb
 
-run:
-	python app.py
-
-test:
-	pytest
+test:           ## run every project's tests
+	@for p in projects/*/; do echo "== $$p"; (cd $$p && python -m pytest -q) || exit 1; done
 
 lint:
 	ruff check .
@@ -16,6 +13,3 @@ lint:
 format:
 	ruff format .
 	ruff check --fix .
-
-demo-figure:
-	python scripts/make_demo_figure.py

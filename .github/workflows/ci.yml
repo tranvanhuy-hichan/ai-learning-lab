@@ -24,8 +24,11 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
 
-  test:
+  vision-toolkit:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/vision-toolkit
     strategy:
       fail-fast: false
       matrix:
@@ -35,13 +38,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: |
-            requirements.txt
-            requirements-dev.txt
       - name: Install CPU PyTorch
         run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-      - name: Install dependencies
-        run: pip install -r requirements.txt -r requirements-dev.txt
-      - name: Run tests
-        run: pytest -q
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pytest -q
+
+  sequence-modeling:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/sequence-modeling
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU PyTorch
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install numpy pandas pyarrow scikit-learn matplotlib pytest
+      - run: pytest -q
+
+  lab-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/lab-web
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install CPU PyTorch
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pytest -q
