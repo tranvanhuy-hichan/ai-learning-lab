@@ -62,6 +62,13 @@ def split_indices(labels: np.ndarray, seed: int = 42) -> dict[str, np.ndarray]:
     return {"train": tr, "val": va, "test": te}
 
 
+def _atomic_save(obj, path: Path) -> None:
+    """Write to a temporary file, then rename, so parallel processes never read a half-written cache."""
+    tmp = path.with_name(f"{path.name}.tmp{os.getpid()}")
+    torch.save(obj, tmp)
+    os.replace(tmp, path)
+
+
 def load_waste(size: int) -> dict:
     CACHE.mkdir(exist_ok=True)
     classes, paths, labels = scan()
@@ -70,7 +77,7 @@ def load_waste(size: int) -> dict:
         x = torch.load(f)
     else:
         x = _stack(paths, size)
-        torch.save(x, f)
+        _atomic_save(x, f)
     idx = split_indices(labels)
     y = torch.from_numpy(labels)
     return {"classes": classes, **{k: (x[v], y[v]) for k, v in idx.items()}}
@@ -85,7 +92,7 @@ def load_pets(size: int, split: str) -> torch.Tensor:
     root = pet_dir()
     names = [ln.split()[0] for ln in (root / "annotations" / f"{split}.txt").read_text().splitlines() if ln.strip()]
     x = _stack([root / "images" / f"{n}.jpg" for n in names], size)
-    torch.save(x, f)
+    _atomic_save(x, f)
     return x
 
 

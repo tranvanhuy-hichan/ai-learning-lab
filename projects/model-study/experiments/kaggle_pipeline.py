@@ -67,6 +67,29 @@ def download_data() -> None:
     os.environ["PET_DATA"] = str(WORK / "pet" / "oxford-iiit-pet")
 
 
+def prepare_caches() -> None:
+    """Decode the images once, before the parallel shards start, so they never race to write the same cache file."""
+    sys.path.insert(0, str(HERE))
+    from study import data
+
+    for size in (128, 192):
+        data.load_waste(size)
+        for split in ("trainval", "test"):
+            data.load_pets(size, split)
+    print("classification caches ready", flush=True)
+
+
+def prepare_seg_caches() -> None:
+    sys.path.insert(0, str(HERE.parent / "vision-toolkit" / "training" / "segmentation"))
+    import common as seg
+
+    seg.DATA_DIR = Path(os.environ["PET_DATA"]).parent
+    for size in (128, 256):
+        for split in ("trainval", "test"):
+            seg._load_split(split, size)
+    print("segmentation caches ready", flush=True)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-seg", action="store_true")
@@ -76,6 +99,7 @@ def main() -> None:
     n = gpus()
     print(f"{n} GPU(s)", flush=True)
     ex = HERE / "experiments"
+    prepare_caches()
 
     run_parallel([[PY, str(ex / "run_ablation.py"), "--shard", f"{i}/{n}"] for i in range(n)], "ablation")
     merge("ablation.shard*.json", "ablation.json")
@@ -84,6 +108,7 @@ def main() -> None:
     )
     subprocess.run([PY, str(ex / "run_compression.py"), "post"], cwd=HERE, check=True)
     if not args.skip_seg:
+        prepare_seg_caches()
         run_parallel([[PY, str(ex / "run_seg_ablation.py"), "--shard", f"{i}/{n}"] for i in range(n)], "seg")
         merge("seg_ablation.shard*.json", "seg_ablation.json")
 
