@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Learning Lab</title>
+  <meta name="description" content="Interactive demos of every model I train while learning AI: image classification, segmentation, RNN/LSTM, Transformer." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="top">
+    <a class="brand" href="#top" aria-label="AI Learning Lab">
+      <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+        <rect width="32" height="32" rx="9" fill="url(#lg)"/>
+        <path d="M9 22 16 8l7 14M11.5 18h9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>AI Learning Lab</span>
+    </a>
+    <div class="controls">
+      <div class="seg" id="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="vi">VI</button>
+      </div>
+      <button type="button" id="theme" class="icon-btn" aria-label="Toggle theme" title="Theme">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      </button>
+      <a class="gh" id="repo-link" href="https://github.com/tranvanhuy-hichan/ai-learning-lab" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="badge"><span class="dot"></span><span data-i18n="hero.badge"></span></p>
+      <h1 data-i18n="hero.title"></h1>
+      <p class="lead" data-i18n="hero.lead"></p>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <nav class="tabs" role="tablist" aria-label="Tools">
+      <button role="tab" data-tab="waste" aria-selected="true"><span class="ico">♻</span><span data-i18n="tab.waste"></span></button>
+      <button role="tab" data-tab="seg" aria-selected="false"><span class="ico">◩</span><span data-i18n="tab.seg"></span></button>
+      <button role="tab" data-tab="sent" aria-selected="false"><span class="ico">✎</span><span data-i18n="tab.sent"></span></button>
+      <button role="tab" data-tab="fc" aria-selected="false"><span class="ico">∿</span><span data-i18n="tab.fc"></span></button>
+    </nav>
+
+    <!-- ============ WASTE ============ -->
+    <section class="tool" id="tool-waste" role="tabpanel">
+      <aside class="card concept">
+        <h2 data-i18n="waste.title"></h2>
+        <p class="muted" data-i18n="waste.desc"></p>
+        <h3 data-i18n="learned"></h3>
+        <ul class="learned">
+          <li data-i18n="waste.l1"></li><li data-i18n="waste.l2"></li><li data-i18n="waste.l3"></li>
+        </ul>
+        <div class="chips" id="facts-waste"></div>
+      </aside>
+      <div class="card play">
+        <label class="drop" id="waste-drop" tabindex="0">
+          <input type="file" accept="image/*" id="waste-file" hidden />
+          <img id="waste-preview" alt="" hidden />
+          <div class="drop-hint"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5m0 0-4 4m4-4 4 4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><b data-i18n="drop.title"></b><span data-i18n="drop.sub"></span></div>
+        </label>
+        <div class="msg" id="waste-msg" hidden></div>
+        <div id="waste-out" class="out" hidden>
+          <div class="verdict"><span class="k" data-i18n="waste.pred"></span><strong id="waste-label"></strong><span class="pct" id="waste-pct"></span></div>
+          <div class="bars" id="waste-bars"></div>
+          <div class="tip"><b data-i18n="waste.tip"></b><p id="waste-tip"></p></div>
+        </div>
+        <p class="note" data-i18n="waste.note"></p>
+      </div>
+    </section>
+
+    <!-- ============ SEGMENTATION ============ -->
+    <section class="tool" id="tool-seg" role="tabpanel" hidden>
+      <aside class="card concept">
+        <h2 data-i18n="seg.title"></h2>
+        <p class="muted" data-i18n="seg.desc"></p>
+        <h3 data-i18n="learned"></h3>
+        <ul class="learned">
+          <li data-i18n="seg.l1"></li><li data-i18n="seg.l2"></li><li data-i18n="seg.l3"></li>
+        </ul>
+        <div class="chips" id="facts-seg"></div>
+      </aside>
+      <div class="card play">
+        <div class="row">
+          <div class="field"><span class="k" data-i18n="seg.model"></span><div class="seg" id="seg-models" role="group"></div></div>
+        </div>
+        <label class="drop slim" id="seg-drop" tabindex="0">
+          <input type="file" accept="image/*" id="seg-file" hidden />
+          <div class="drop-hint"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5m0 0-4 4m4-4 4 4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><b data-i18n="drop.title"></b><span data-i18n="drop.sub"></span></div>
+        </label>
+        <div class="examples"><span class="k" data-i18n="seg.examples"></span><div id="seg-examples" class="thumbs"></div></div>
+        <div class="msg" id="seg-msg" hidden></div>
+        <div id="seg-out" class="out" hidden>
+          <div class="canvas-wrap"><canvas id="seg-canvas"></canvas></div>
+          <div class="row between">
+            <label class="slider"><span class="k" data-i18n="seg.opacity"></span><input type="range" id="seg-opacity" min="0" max="100" value="55" /></label>
+            <div class="legend" id="seg-legend"></div>
+          </div>
+          <div class="bars" id="seg-bars"></div>
+        </div>
+        <p class="note" data-i18n="seg.note"></p>
+      </div>
+    </section>
+
+    <!-- ============ SENTIMENT ============ -->
+    <section class="tool" id="tool-sent" role="tabpanel" hidden>
+      <aside class="card concept">
+        <h2 data-i18n="sent.title"></h2>
+        <p class="muted" data-i18n="sent.desc"></p>
+        <h3 data-i18n="learned"></h3>
+        <ul class="learned">
+          <li data-i18n="sent.l1"></li><li data-i18n="sent.l2"></li><li data-i18n="sent.l3"></li>
+        </ul>
+        <div class="chips" id="facts-sent"></div>
+      </aside>
+      <div class="card play">
+        <p class="warn" data-i18n="sent.lang"></p>
+        <textarea id="sent-text" rows="5" maxlength="5000" data-i18n-ph="sent.ph"></textarea>
+        <div class="examples"><span class="k" data-i18n="sent.examples"></span><div id="sent-examples" class="pills"></div></div>
+        <div class="row"><button type="button" class="btn" id="sent-go" data-i18n="sent.go"></button><span class="count" id="sent-count"></span></div>
+        <div class="msg" id="sent-msg" hidden></div>
+        <div id="sent-out" class="cards2" hidden></div>
+      </div>
+    </section>
+
+    <!-- ============ FORECAST ============ -->
+    <section class="tool" id="tool-fc" role="tabpanel" hidden>
+      <aside class="card concept">
+        <h2 data-i18n="fc.title"></h2>
+        <p class="muted" data-i18n="fc.desc"></p>
+        <h3 data-i18n="learned"></h3>
+        <ul class="learned">
+          <li data-i18n="fc.l1"></li><li data-i18n="fc.l2"></li><li data-i18n="fc.l3"></li>
+        </ul>
+        <div class="chips" id="facts-fc"></div>
+      </aside>
+      <div class="card play">
+        <div class="field"><span class="k" data-i18n="fc.pick"></span><div class="pills" id="fc-samples"></div></div>
+        <div class="msg" id="fc-msg" hidden></div>
+        <div class="chart-wrap"><svg id="fc-chart" viewBox="0 0 680 270" role="img" aria-label="Temperature chart"></svg></div>
+        <div class="legend" id="fc-legend"></div>
+        <div id="fc-table" class="table"></div>
+        <details class="custom">
+          <summary data-i18n="fc.custom"></summary>
+          <textarea id="fc-custom" rows="3" data-i18n-ph="fc.custom.ph"></textarea>
+          <button type="button" class="btn ghost" id="fc-custom-go" data-i18n="fc.custom.go"></button>
+        </details>
+        <p class="note" data-i18n="fc.note"></p>
+      </div>
+    </section>
+
+    <!-- ============ JOURNEY ============ -->
+    <section class="journey">
+      <h2 data-i18n="journey.title"></h2>
+      <p class="lead" data-i18n="journey.lead"></p>
+      <ol class="steps">
+        <li><b>1</b><div><h4 data-i18n="journey.s1.t"></h4><p data-i18n="journey.s1.d"></p></div></li>
+        <li><b>2</b><div><h4 data-i18n="journey.s2.t"></h4><p data-i18n="journey.s2.d"></p></div></li>
+        <li><b>3</b><div><h4 data-i18n="journey.s3.t"></h4><p data-i18n="journey.s3.d"></p></div></li>
+      </ol>
+      <div class="links">
+        <a class="btn ghost" data-repo="/blob/main/learning/ROADMAP.md" target="_blank" rel="noopener" data-i18n="journey.roadmap"></a>
+        <a class="btn ghost" data-repo="/tree/main/learning/log" target="_blank" rel="noopener" data-i18n="journey.log"></a>
+        <a class="btn ghost" data-repo="/tree/main/learning/notes" target="_blank" rel="noopener" data-i18n="journey.notes"></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p data-i18n="foot.1"></p>
+    <p class="muted" data-i18n="foot.2"></p>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

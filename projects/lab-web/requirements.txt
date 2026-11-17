@@ -1,0 +1,9 @@
+-e ../vision-toolkit
+fastapi
+uvicorn
+python-multipart
+pillow
+numpy
+torch>=2.0
+# Optional: enables the DistilBERT comparison in the sentiment tool
+# transformers

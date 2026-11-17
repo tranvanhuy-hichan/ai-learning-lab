@@ -1,0 +1,34 @@
+{
+ "waste": {
+  "accuracy": 0.9613,
+  "macro_f1": 0.953,
+  "params_m": 4.02
+ },
+ "unet": {
+  "miou": 0.767,
+  "border_iou": 0.548,
+  "params_m": 7.76
+ },
+ "resnet_unet": {
+  "miou": 0.809,
+  "border_iou": 0.617,
+  "params_m": 14.34
+ },
+ "lstm": {
+  "accuracy": 0.8766,
+  "params_m": 2.82
+ },
+ "distilbert": {
+  "accuracy": 0.9159,
+  "params_m": 67.0
+ },
+ "rnn_temp": {
+  "mae": 1.73,
+  "params_m": 0.0127
+ },
+ "lstm_temp": {
+  "mae": 1.714,
+  "params_m": 0.0505
+ },
+ "persistence_mae": 2.036
+}
