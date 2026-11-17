@@ -8,3 +8,12 @@ flagged/
 .gradio/
 *.egg-info/
 projects/*/outputs/*.pt
+
+# model-study: large or regenerable artefacts
+projects/model-study/cache/
+projects/model-study/results/runs/
+projects/model-study/results/compressed/
+projects/model-study/results/seg_runs/
+projects/model-study/results/*.log
+projects/model-study/results/*.shard*.json
+projects/model-study/results/ablation_local_partial.json

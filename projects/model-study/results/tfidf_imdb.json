@@ -1,0 +1,30 @@
+{
+ "logreg_1-1gram": {
+  "val_acc": 0.896,
+  "test_acc": 0.88724,
+  "C": 4,
+  "features": 42964,
+  "seconds": 38.5309636592865
+ },
+ "linear_svm_1-1gram": {
+  "val_acc": 0.8972,
+  "test_acc": 0.88836,
+  "C": 0.2,
+  "features": 42964,
+  "seconds": 41.182682275772095
+ },
+ "logreg_1-2gram": {
+  "val_acc": 0.91,
+  "test_acc": 0.90552,
+  "C": 64,
+  "features": 400000,
+  "seconds": 52.23772096633911
+ },
+ "linear_svm_1-2gram": {
+  "val_acc": 0.9092,
+  "test_acc": 0.90356,
+  "C": 3.2,
+  "features": 400000,
+  "seconds": 60.688963890075684
+ }
+}

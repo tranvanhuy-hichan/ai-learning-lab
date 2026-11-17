@@ -41,3 +41,23 @@ def test_segment_pet_returns_original_resolution(w, h):
     overlay, mask, stats = inf.segment_pet(_img(w, h), inf.available_segmenters()[0])
     assert overlay.size == mask.size == (w, h)
     assert abs(sum(stats.values()) - 100) < 0.5
+
+
+def test_gradcam_shape_and_range():
+    from vision_toolkit.explain import gradcam, heat, overlay
+
+    m = build_waste_classifier(12).eval()
+    x = torch.randn(2, 3, 128, 128)
+    cam, logits = gradcam(m, x)
+    assert cam.shape == (2, 128, 128) and logits.shape == (2, 12)
+    assert float(cam.min()) >= 0 and float(cam.max()) <= 1.0001
+    assert heat(cam[0].numpy()).shape == (128, 128, 3)
+    assert overlay(_img(200, 150), cam[0].numpy()).size == (200, 150)
+
+
+@pytest.mark.skipif(not inf.WASTE_WEIGHTS.exists(), reason="waste weights missing")
+def test_analyze_waste_returns_a_verdict():
+    out = inf.analyze_waste(_img(), explain=True)
+    assert out["status"] in {"ok", "uncertain", "unknown"}
+    assert abs(sum(out["probs"].values()) - 1) < 1e-4
+    assert out["cam"].shape == (128, 128)

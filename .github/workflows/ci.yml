@@ -76,3 +76,18 @@ jobs:
         run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
       - run: pip install -r requirements.txt -r requirements-dev.txt
       - run: pytest -q
+
+  model-study:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/model-study
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU PyTorch
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pytest -q

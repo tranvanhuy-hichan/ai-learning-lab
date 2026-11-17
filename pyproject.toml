@@ -11,6 +11,7 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 "projects/vision-toolkit/app.py" = ["E402"]
 "projects/vision-toolkit/scripts/*" = ["E402"]
+"projects/model-study/**" = ["E501"]  # research code: long lines in tables and figure setup are fine
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.File", "fastapi.Form"]

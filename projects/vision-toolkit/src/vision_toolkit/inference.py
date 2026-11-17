@@ -69,6 +69,62 @@ def predict_waste(image: Image.Image) -> dict[str, float]:
     return dict(zip(waste_labels(), p, strict=True))
 
 
+CALIBRATION_FILE = MODELS_DIR / "waste_calibration.json"
+
+
+def waste_calibration() -> dict | None:
+    """Temperature and decision thresholds fitted by projects/model-study (None if the file is absent)."""
+    return json.loads(CALIBRATION_FILE.read_text()) if CALIBRATION_FILE.exists() else None
+
+
+def _ood_score(logits: torch.Tensor, method: str) -> float:
+    """Higher means 'looks more like the waste classes'."""
+    if method == "energy":
+        return torch.logsumexp(logits, dim=1).item()
+    if method == "max_logit":
+        return logits.max(1).values.item()
+    return logits.softmax(1).max(1).values.item()
+
+
+def analyze_waste(image: Image.Image, explain: bool = False) -> dict:
+    """Calibrated prediction plus an honest verdict.
+
+    status: "ok" (confident), "uncertain" (calibrated confidence below the threshold chosen on validation data),
+    or "unknown" (the image does not look like any waste class, e.g. a pet photo).
+    With explain=True also returns a Grad-CAM map (numpy, 0..1, at 128 px) for the predicted class.
+    """
+    from .explain import gradcam
+
+    model = _waste_model()
+    x = _waste_tf(image.convert("RGB")).unsqueeze(0).to(DEVICE)
+    if explain:
+        cam, logits = gradcam(model, x)
+    else:
+        with torch.no_grad():
+            logits = model(x)
+        cam = None
+    logits = logits.float()
+    cal = waste_calibration()
+    temperature = cal["temperature"] if cal else 1.0
+    probs = (logits / temperature).softmax(1)[0].cpu().tolist()
+    labels = waste_labels()
+    status, ood = "ok", None
+    if cal:
+        method, thr = cal["ood"]["method"], cal["ood"]["threshold"]
+        ood = {"method": method, "score": _ood_score(logits, method), "threshold": thr}
+        if ood["score"] < thr:
+            status = "unknown"
+        elif max(probs) < cal["uncertain"]["threshold"]:
+            status = "uncertain"
+    return {
+        "probs": dict(zip(labels, probs, strict=True)),
+        "status": status,
+        "temperature": temperature,
+        "ood": ood,
+        "cam": None if cam is None else cam[0].cpu().numpy(),
+    }
+
+
 # ------------------------------------------------------------------ pet segmentation
 SEG_CLASSES = ["pet", "background", "border"]
 SEG_PALETTE = np.array([[230, 60, 60], [60, 60, 200], [250, 220, 60]], dtype=np.uint8)
