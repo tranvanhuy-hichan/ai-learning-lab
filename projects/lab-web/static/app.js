@@ -6,10 +6,16 @@ const REPO = "https://github.com/tranvanhuy-hichan/ai-learning-lab";
 /* ----------------------------------------------------------------- translations */
 const I18N = {
   en: {
-    "hero.badge": "Learning in public · every demo is a model I trained",
-    "hero.title": "Learn it. Build it. Try it.",
-    "hero.lead": "I study AI from courses and books, then apply each idea here. Every tool below runs a model I trained myself: CNNs, U-Net, RNN, LSTM and a fine-tuned Transformer.",
-    "tab.waste": "Waste classifier", "tab.seg": "Pet segmentation", "tab.sent": "Review sentiment", "tab.fc": "Temperature forecast",
+    "hero.badge": "Learning in public",
+    "hero.title": "What I am learning about AI, and the models I built to test it",
+    "hero.lead": "I study from courses and books, write a short note, then train and measure a model to see whether I really understood. Each section below runs one of those models on your own input.",
+    "nav.waste": "Waste", "nav.seg": "Segmentation", "nav.sent": "Sentiment", "nav.fc": "Forecast",
+    "nav.journey": "Journey", "theme.title": "Light / dark",
+    "tbl.task": "Task", "tbl.model": "Best model", "tbl.result": "Result", "tbl.note": "For comparison",
+    "tbl.cap": "Table 1. Test-set results. Every number is a single training run with one seed, so small gaps are not conclusive.",
+    "tbl.waste": "12-class accuracy", "tbl.seg": "mIoU", "tbl.sent": "accuracy", "tbl.fc": "mean absolute error",
+    "tbl.scratch": "CNN from scratch",
+    "tab.waste": "Waste classification", "tab.seg": "Pet segmentation", "tab.sent": "Review sentiment", "tab.fc": "Temperature forecast",
     learned: "What I learned",
     "drop.title": "Drop an image here", "drop.sub": "or click to choose (JPG/PNG, up to 8 MB)",
     "stat.waste": "waste classifier accuracy", "stat.seg": "pet segmentation mIoU", "stat.sent": "review sentiment accuracy", "stat.fc": "forecast error (MAE)",
@@ -71,9 +77,15 @@ const I18N = {
     "err.net": "Cannot reach the server.", "err.generic": "Something went wrong",
   },
   vi: {
-    "hero.badge": "Học công khai · mỗi demo là một mô hình do mình huấn luyện",
-    "hero.title": "Học. Làm. Thử ngay.",
-    "hero.lead": "Mình học AI từ môn học và sách, rồi áp dụng từng ý tưởng vào đây. Mỗi công cụ bên dưới chạy một mô hình mình tự huấn luyện: CNN, U-Net, RNN, LSTM và một Transformer được fine-tune.",
+    "hero.badge": "Học công khai",
+    "hero.title": "Mình đang học gì về AI, và các mô hình mình xây để kiểm chứng",
+    "hero.lead": "Mình học từ môn học và sách, viết một ghi chú ngắn, rồi huấn luyện và đo một mô hình để xem mình đã thật sự hiểu chưa. Mỗi phần bên dưới chạy một mô hình như vậy trên dữ liệu của chính bạn.",
+    "nav.waste": "Phân loại rác", "nav.seg": "Phân đoạn", "nav.sent": "Cảm xúc", "nav.fc": "Dự báo",
+    "nav.journey": "Hành trình", "theme.title": "Sáng / tối",
+    "tbl.task": "Bài toán", "tbl.model": "Mô hình tốt nhất", "tbl.result": "Kết quả", "tbl.note": "So sánh",
+    "tbl.cap": "Bảng 1. Kết quả trên tập test. Mỗi con số là một lần huấn luyện với một seed, nên chênh lệch nhỏ chưa mang tính kết luận.",
+    "tbl.waste": "accuracy 12 lớp", "tbl.seg": "mIoU", "tbl.sent": "accuracy", "tbl.fc": "sai số tuyệt đối trung bình",
+    "tbl.scratch": "CNN từ đầu",
     "tab.waste": "Phân loại rác", "tab.seg": "Phân đoạn thú cưng", "tab.sent": "Cảm xúc review", "tab.fc": "Dự báo nhiệt độ",
     learned: "Mình đã học được",
     "drop.title": "Thả ảnh vào đây", "drop.sub": "hoặc bấm để chọn (JPG/PNG, tối đa 8 MB)",
@@ -149,7 +161,7 @@ const SENT_EXAMPLES = [
   ["sent.ex4", "The first hour was slow and dull, however the ending completely won me over."],
 ];
 const SEG_COLORS = { pet: "#e63c3c", background: "#3c3cc8", border: "#fadc3c" };
-const FC_COLORS = { rnn: "#22d3ee", lstm: "#8b5cf6", base: "#94a3b8", actual: "#34d399" };
+const FC_COLORS = { rnn: "#1f5fbf", lstm: "#c2561b", base: "#8a8a85", actual: "#2c6e49" };
 
 /* ----------------------------------------------------------------- helpers */
 const $ = (s, r = document) => r.querySelector(s);
@@ -220,15 +232,16 @@ function setupDrop(drop, input, onFile) {
 const loadImage = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
 
 /* ----------------------------------------------------------------- stats & facts */
-function fact(label, value) { return h("span", { class: "chip" }, `${label} `, h("b", {}, value)); }
+function fact(label, value) { return h("span", {}, `${label} `, h("b", {}, value)); }
 function renderStats() {
   const m = (state.models && state.models.metrics) || {};
-  const tiles = [];
-  if (m.waste) tiles.push([pct(m.waste.accuracy, 1), "stat.waste"]);
-  if (m.resnet_unet) tiles.push([m.resnet_unet.miou.toFixed(2), "stat.seg"]);
-  if (m.distilbert) tiles.push([pct(m.distilbert.accuracy, 1), "stat.sent"]);
-  if (m.lstm_temp) tiles.push([`${m.lstm_temp.mae.toFixed(1)} °C`, "stat.fc"]);
-  $("#stats").replaceChildren(...tiles.map(([v, k]) => h("div", { class: "stat" }, h("b", {}, v), h("span", {}, t(k)))));
+  const link = (id, key) => h("a", { href: `#${id}` }, t(key));
+  const rows = [];
+  if (m.waste) rows.push([link("waste", "tab.waste"), "EfficientNet-B0", pct(m.waste.accuracy, 1), `${t("tbl.waste")}`]);
+  if (m.resnet_unet) rows.push([link("seg", "tab.seg"), "ResNet18-encoder U-Net", m.resnet_unet.miou.toFixed(3), `${t("tbl.seg")}; U-Net ${m.unet.miou.toFixed(3)}`]);
+  if (m.distilbert) rows.push([link("sent", "tab.sent"), "DistilBERT", pct(m.distilbert.accuracy, 1), `${t("tbl.sent")}; BiLSTM ${pct(m.lstm.accuracy, 1)}`]);
+  if (m.lstm_temp) rows.push([link("fc", "tab.fc"), "LSTM", `${m.lstm_temp.mae.toFixed(2)} °C`, `${t("tbl.fc")}; RNN ${m.rnn_temp.mae.toFixed(2)}, ${t("fact.base")} ${m.persistence_mae.toFixed(2)}`]);
+  $("#results-body").replaceChildren(...rows.map((r) => h("tr", {}, ...r.map((c) => h("td", {}, c)))));
   const f = (id, chips) => $(id).replaceChildren(...chips);
   if (m.waste) f("#facts-waste", [fact(t("fact.acc"), pct(m.waste.accuracy, 1)), fact(t("fact.f1"), m.waste.macro_f1.toFixed(3)), fact(t("fact.params"), `${m.waste.params_m}M`)]);
   if (m.unet && m.resnet_unet) f("#facts-seg", [fact("U-Net " + t("fact.miou"), m.unet.miou.toFixed(3)), fact("ResNet-U-Net " + t("fact.miou"), m.resnet_unet.miou.toFixed(3)), fact(t("fact.border"), `${m.unet.border_iou.toFixed(2)} → ${m.resnet_unet.border_iou.toFixed(2)}`)]);
@@ -363,7 +376,7 @@ function drawChart() {
 }
 function renderForecast() {
   const { values, actual, preds } = state.fc;
-  $("#fc-legend").replaceChildren(...[["fc.history", "#e6eaf5"], ["fc.rnn", FC_COLORS.rnn], ["fc.lstm", FC_COLORS.lstm], ["fc.base", FC_COLORS.base], ["fc.actual", FC_COLORS.actual]]
+  $("#fc-legend").replaceChildren(...[["fc.history", "var(--ink)"], ["fc.rnn", FC_COLORS.rnn], ["fc.lstm", FC_COLORS.lstm], ["fc.base", FC_COLORS.base], ["fc.actual", FC_COLORS.actual]]
     .map(([k, c]) => h("span", {}, h("i", { style: `background:${c}` }), t(k))));
   drawChart();
   const tbl = $("#fc-table");
@@ -373,7 +386,7 @@ function renderForecast() {
   tbl.replaceChildren(
     h("div", { class: "tr head" }, h("span", {}, t("fc.model")), h("span", {}, t("fc.forecast")), h("span", {}, actual == null ? "" : t("fc.error"))),
     row("fc.rnn", preds.rnn, FC_COLORS.rnn, err(preds.rnn)), row("fc.lstm", preds.lstm, FC_COLORS.lstm, err(preds.lstm)),
-    row("fc.base", preds.persistence, FC_COLORS.base, err(preds.persistence)), row("fc.mean7", preds.mean7, "#f59e0b", err(preds.mean7)),
+    row("fc.base", preds.persistence, FC_COLORS.base, err(preds.persistence)), row("fc.mean7", preds.mean7, "#a58a3a", err(preds.mean7)),
     ...(actual != null ? [row("fc.actual", actual, FC_COLORS.actual, "")] : []));
 }
 async function runForecast(values, actual) {
@@ -402,22 +415,16 @@ function applyI18n() {
   document.title = state.lang === "vi" ? "AI Learning Lab · Học và thử AI" : "AI Learning Lab · Learn and try AI";
   $$("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   $$("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  $$("[data-i18n-title]").forEach((el) => { el.title = t(el.dataset.i18nTitle); });
   $$("#lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
   $$("[data-repo]").forEach((a) => { a.href = REPO + a.dataset.repo; });
   renderStats(); renderSentExamples(); renderSegModels(); renderSeg(); renderWaste(); renderSent(); renderFcSamples(); renderForecast();
   if ($("#sent-go") && !$("#sent-go").disabled) $("#sent-go").textContent = t("sent.go");
 }
-function setTab(name) {
-  $$(".tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
-  $$(".tool").forEach((s) => { s.hidden = s.id !== `tool-${name}`; });
-  history.replaceState(null, "", `#${name}`);
-}
-
 async function init() {
   document.documentElement.dataset.theme = state.theme;
   $$("#lang button").forEach((b) => b.addEventListener("click", () => { state.lang = b.dataset.lang; store.set("lang", state.lang); applyI18n(); }));
   $("#theme").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; store.set("theme", state.theme); document.documentElement.dataset.theme = state.theme; });
-  $$(".tabs button").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
   setupDrop($("#waste-drop"), $("#waste-file"), runWaste);
   setupDrop($("#seg-drop"), $("#seg-file"), runSeg);
   $("#seg-opacity").addEventListener("input", drawSeg);
@@ -426,8 +433,6 @@ async function init() {
   $("#sent-text").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) runSent(); });
   $("#fc-custom-go").addEventListener("click", parseCustom);
   updateCount();
-  const tab = location.hash.slice(1);
-  setTab(["waste", "seg", "sent", "fc"].includes(tab) ? tab : "waste");
   applyI18n();
 
   try { state.models = await api("/api/models"); } catch (e) { ["#waste-msg", "#seg-msg", "#sent-msg", "#fc-msg"].forEach((id) => showMsg(id, e.message)); return; }
