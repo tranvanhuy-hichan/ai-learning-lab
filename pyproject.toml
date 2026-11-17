@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-vision-toolkit"
+version = "0.1.0"
+description = "Waste classification (EfficientNet-B0) and pet segmentation (U-Net) behind a Gradio web app."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Tran Van Huy" }]
+keywords = ["computer-vision", "pytorch", "image-classification", "semantic-segmentation", "unet", "efficientnet", "gradio"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "gradio>=4.0",
+    "pillow",
+    "numpy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "matplotlib"]
+
+[project.urls]
+Homepage = "https://github.com/tranvanhuy-hichan/ai-vision-toolkit"
+Issues = "https://github.com/tranvanhuy-hichan/ai-vision-toolkit/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["training"]  # research notebooks and their helper module
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"app.py" = ["E402"]
+"scripts/*" = ["E402"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
