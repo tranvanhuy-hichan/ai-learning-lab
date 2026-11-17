@@ -17,6 +17,7 @@
         <a href="#seg" data-i18n="nav.seg"></a>
         <a href="#sent" data-i18n="nav.sent"></a>
         <a href="#fc" data-i18n="nav.fc"></a>
+        <a href="#study" data-i18n="study.nav"></a>
         <a href="#journey" data-i18n="nav.journey"></a>
       </nav>
       <div class="controls">
@@ -58,9 +59,13 @@
           <img id="waste-preview" alt="" hidden />
           <div class="drop-hint"><b data-i18n="drop.title"></b><span data-i18n="drop.sub"></span></div>
         </label>
+        <div class="row">
+          <button type="button" class="btn ghost camera-btn" id="waste-camera-open" data-i18n="camera.open"></button>
+        </div>
         <div class="msg" id="waste-msg" hidden></div>
         <div id="waste-out" class="out" hidden>
           <p class="verdict"><span class="k" data-i18n="waste.pred"></span> <strong id="waste-label"></strong> <span class="pct" id="waste-pct"></span></p>
+          <p class="msg info" id="waste-verdict-msg" hidden></p>
           <div class="bars" id="waste-bars"></div>
           <p class="tip"><span class="k" data-i18n="waste.tip"></span> <span id="waste-tip"></span></p>
         </div>
@@ -85,6 +90,9 @@
           <input type="file" accept="image/*" id="seg-file" hidden />
           <div class="drop-hint"><b data-i18n="drop.title"></b><span data-i18n="drop.sub"></span></div>
         </label>
+        <div class="row">
+          <button type="button" class="btn ghost camera-btn" id="seg-camera-open" data-i18n="camera.open"></button>
+        </div>
         <div class="examples"><span class="k" data-i18n="seg.examples"></span><div id="seg-examples" class="thumbs"></div></div>
         <div class="msg" id="seg-msg" hidden></div>
         <div id="seg-out" class="out" hidden>
@@ -140,6 +148,14 @@
       <p class="caption" data-i18n="fc.note"></p>
     </section>
 
+    <section class="tool" id="study">
+      <h2 data-i18n="study.title"></h2>
+      <p class="lead" data-i18n="study.desc"></p>
+      <p class="caption" data-i18n="study.stats"></p>
+      <div id="study-tables"></div>
+      <p class="caption"><a data-repo="/blob/main/projects/model-study/results/REPORT.md" target="_blank" rel="noopener" data-i18n="study.report"></a></p>
+    </section>
+
     <!-- ============ JOURNEY ============ -->
     <section class="tool journey" id="journey">
       <h2 data-i18n="journey.title"></h2>
@@ -163,6 +179,19 @@
       <p data-i18n="foot.2"></p>
     </div>
   </footer>
+
+  <dialog class="camera-modal" id="camera-modal" aria-labelledby="camera-title">
+    <div class="camera-box">
+      <h2 id="camera-title" data-i18n="camera.title"></h2>
+      <video id="camera-video" autoplay playsinline muted></video>
+      <canvas id="camera-canvas" hidden></canvas>
+      <p class="msg" id="camera-msg" hidden></p>
+      <div class="camera-actions">
+        <button type="button" class="btn" id="camera-shoot" data-i18n="camera.shoot"></button>
+        <button type="button" class="btn ghost" id="camera-close" data-i18n="camera.cancel"></button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="/app.js" defer></script>
 </body>

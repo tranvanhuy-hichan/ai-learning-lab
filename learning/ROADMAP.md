@@ -28,10 +28,10 @@ A 24-week plan for learning machine learning through Jupyter notebooks, from Num
 | 16 | CNNs: convolution, pooling, receptive field | Applied here | [CNN note](notes/01-cnn-and-channels.md) |
 | 17 | Transfer learning | Applied here | [ResNet / EfficientNet note](notes/02-transfer-learning.md) |
 | 18 | A computer-vision project with error analysis; segmentation concepts | Applied here | [Vision Toolkit](../projects/vision-toolkit), [U-Net note](notes/04-unet-segmentation.md) |
-| 19 | Classic text classification (TF-IDF, Naive Bayes, linear SVM) | Not tracked yet | |
+| 19 | Classic text classification (TF-IDF, Naive Bayes, linear SVM) | Partly applied | [TF-IDF + Logistic Regression / SVM](../projects/model-study/results/REPORT.md); Naive Bayes pending |
 | 20 | Topic modelling (LDA, LSA) | Not tracked yet | |
 | 21 | Embeddings, RNN / LSTM intuition, attention | Partly applied | [RNN and LSTM note](notes/05-rnn-lstm.md), [Transformer note](notes/06-transformer-attention.md) |
-| 22 | Transformers and fine-tuning | Partly applied | DistilBERT fine-tune in [Sequence Modeling](../projects/sequence-modeling); the planned TF-IDF + SVM comparison is **not done yet** |
+| 22 | Transformers and fine-tuning | Partly applied | DistilBERT fine-tune in [Sequence Modeling](../projects/sequence-modeling); the [TF-IDF + SVM comparison is complete](../projects/model-study/results/REPORT.md) |
 | 23 | Choose a capstone | Not tracked yet | |
 | 24 | Ablations, error analysis, a 10-minute talk | Not tracked yet | |
 
@@ -39,7 +39,7 @@ A 24-week plan for learning machine learning through Jupyter notebooks, from Num
 
 Things I want to do next, in no firm order:
 
-- [ ] The TF-IDF + linear SVM baseline for IMDB, so the DistilBERT result has an honest comparison.
+- [x] The TF-IDF + linear SVM baseline for IMDB, so the DistilBERT result has an honest comparison.
 - [ ] Re-run the key experiments with several seeds and report the spread.
 - [ ] A clean ablation for the segmentation gain (pretrained encoder, image size, border weight, one at a time).
 - [ ] An experiment where long-range memory really matters, to test the LSTM claim properly (see the [RNN and LSTM note](notes/05-rnn-lstm.md)).
@@ -76,10 +76,10 @@ Kế hoạch 24 tuần học machine learning qua Jupyter Notebook, từ NumPy �
 | 16 | CNN: tích chập, pooling, receptive field | Đã áp dụng | [ghi chú CNN](notes/01-cnn-and-channels.md) |
 | 17 | Transfer learning | Đã áp dụng | [ghi chú ResNet / EfficientNet](notes/02-transfer-learning.md) |
 | 18 | Dự án thị giác máy tính có phân tích lỗi; khái niệm phân đoạn | Đã áp dụng | [Vision Toolkit](../projects/vision-toolkit), [ghi chú U-Net](notes/04-unet-segmentation.md) |
-| 19 | Phân loại văn bản cổ điển (TF-IDF, Naive Bayes, SVM tuyến tính) | Chưa ghi nhận | |
+| 19 | Phân loại văn bản cổ điển (TF-IDF, Naive Bayes, SVM tuyến tính) | Áp dụng một phần | [TF-IDF + Logistic Regression / SVM](../projects/model-study/results/REPORT.md); chưa làm Naive Bayes |
 | 20 | Topic modeling (LDA, LSA) | Chưa ghi nhận | |
 | 21 | Embedding, trực giác RNN / LSTM, attention | Áp dụng một phần | [ghi chú RNN và LSTM](notes/05-rnn-lstm.md), [ghi chú Transformer](notes/06-transformer-attention.md) |
-| 22 | Transformer và fine-tuning | Áp dụng một phần | Fine-tune DistilBERT trong [Sequence Modeling](../projects/sequence-modeling); phần so sánh TF-IDF + SVM đã lên kế hoạch **chưa làm** |
+| 22 | Transformer và fine-tuning | Áp dụng một phần | Fine-tune DistilBERT trong [Sequence Modeling](../projects/sequence-modeling); [đã có so sánh TF-IDF + SVM](../projects/model-study/results/REPORT.md) |
 | 23 | Chọn dự án cuối khóa | Chưa ghi nhận | |
 | 24 | Ablation, phân tích lỗi, trình bày 10 phút | Chưa ghi nhận | |
 
@@ -87,7 +87,9 @@ Kế hoạch 24 tuần học machine learning qua Jupyter Notebook, từ NumPy �
 
 Những việc mình muốn làm tiếp, không theo thứ tự cố định:
 
-- [ ] Baseline TF-IDF + SVM tuyến tính cho IMDB, để kết quả DistilBERT có so sánh trung thực.
+- [x] Baseline TF-IDF + SVM tuyến tính cho IMDB, để kết quả DistilBERT có so sánh trung thực.
 - [ ] Chạy lại các thí nghiệm chính với nhiều seed và báo cáo độ dao động.
 - [ ] Ablation sạch cho mức cải thiện của phân đoạn (encoder pretrained, kích thước ảnh, trọng số viền, từng thứ một).
 - [ ] Thí nghiệm mà trí nhớ xa thật sự quan trọng, để kiểm tra đúng nhận định về LSTM (xem [ghi chú RNN và LSTM](notes/05-rnn-lstm.md)).
+
+2026-11-17: [Kaggle results](../projects/model-study/results/REPORT.md) include 3 seeds for waste ablation and students. The clean segmentation rerun and multi-seed IMDB comparison remain pending.

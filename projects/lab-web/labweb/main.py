@@ -64,10 +64,12 @@ def models() -> dict:
 
 
 @app.post("/api/waste")
-def waste(file: UploadFile = File(...)) -> dict:
+def waste(file: UploadFile = File(...), explain: bool = True) -> dict:
     if not vision.WASTE_WEIGHTS.exists():
         raise HTTPException(503, "Waste classifier weights are not installed")
-    return services.classify_waste(_read_image(file))
+    out = services.classify_waste(_read_image(file), explain=explain)
+    out["cam"] = _png_data_url(out["cam"]) if out["cam"] is not None else None
+    return out
 
 
 @app.post("/api/segment")

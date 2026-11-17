@@ -1,0 +1,11 @@
+{
+  "kernel": "hichandut/model-study",
+  "kernel_id": 145591282,
+  "status": "COMPLETE",
+  "download_date_local": "2026-11-17",
+  "timezone": "Asia/Bangkok",
+  "archive_sha256": "ed14b04da99cad475d12f6eebe5eb6ff3df4e7e4e46ddf73e6880f46609ed225",
+  "archive_bytes": 349842609,
+  "archive_members": 84,
+  "segmentation_recipe": "historical: C changes lr + epochs; E changes size + batch; A-D seeds 0,1; E seed 0"
+}

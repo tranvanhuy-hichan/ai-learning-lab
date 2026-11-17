@@ -2,11 +2,12 @@
 
   A  U-Net from scratch                         (128 px, 30 epochs, lr 2e-3)
   B  A, but with a pretrained ResNet18 encoder  <- only the encoder changes
-  C  B, with lr 1e-3 and 25 epochs              <- only the training recipe changes
+  C  B, with lr 1e-3                           <- only the learning rate changes
   D  C, with border-class loss weight 3         <- only the loss weight changes
   E  D, at 256 px                               <- only the resolution changes
 
 The steps are cumulative, so the effect of each change is measured on top of the previous ones (order matters).
+All steps use 30 epochs and batch size 16, with seeds 0 and 1.
 All scored on the official 3,669-image test set at the resolution the model was trained at.
 """
 
@@ -26,13 +27,13 @@ import common as seg  # noqa: E402  (training helpers of the vision-toolkit)
 
 RESULTS = HERE / "results"
 CONFIGS = {
-    "A_scratch": dict(model="unet", size=128, epochs=30, lr=2e-3, weights=None, batch=32),
-    "B_pretrained_encoder": dict(model="resnet", size=128, epochs=30, lr=2e-3, weights=None, batch=32),
-    "C_recipe": dict(model="resnet", size=128, epochs=25, lr=1e-3, weights=None, batch=32),
-    "D_border_weight": dict(model="resnet", size=128, epochs=25, lr=1e-3, weights=[1.0, 1.0, 3.0], batch=32),
-    "E_256px": dict(model="resnet", size=256, epochs=25, lr=1e-3, weights=[1.0, 1.0, 3.0], batch=16),
+    "A_scratch": dict(model="unet", size=128, epochs=30, lr=2e-3, weights=None, batch=16),
+    "B_pretrained_encoder": dict(model="resnet", size=128, epochs=30, lr=2e-3, weights=None, batch=16),
+    "C_learning_rate": dict(model="resnet", size=128, epochs=30, lr=1e-3, weights=None, batch=16),
+    "D_border_weight": dict(model="resnet", size=128, epochs=30, lr=1e-3, weights=[1.0, 1.0, 3.0], batch=16),
+    "E_256px": dict(model="resnet", size=256, epochs=30, lr=1e-3, weights=[1.0, 1.0, 3.0], batch=16),
 }
-JOBS = [("E_256px", 0)] + [(n, s) for s in (0, 1) for n in CONFIGS if n != "E_256px"]  # longest first, then both seeds
+JOBS = [(name, seed) for seed in (0, 1) for name in reversed(CONFIGS)]  # longest first, both seeds
 
 
 def main() -> None:
@@ -47,11 +48,18 @@ def main() -> None:
     seg.OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = RESULTS / ("seg_ablation.json" if nshards == 1 else f"seg_ablation.shard{shard}.json")
     done = json.loads(out.read_text()) if out.exists() else {}
+    # Discard obsolete recipes so reports never mix old and corrected runs.
+    done = {key: result for key, result in done.items()
+            if key.split("/")[0] in CONFIGS
+            and all(result.get(k) == v for k, v in CONFIGS[key.split("/")[0]].items())}
     for n, (name, seed) in enumerate(JOBS):
         key = f"{name}/s{seed}"
-        if n % nshards != shard or key in done:
+        if n % nshards != shard:
             continue
         cfg = CONFIGS[name]
+        # Resume only configurations matching the current experiment.
+        if key in done and all(done[key].get(k) == v for k, v in cfg.items()):
+            continue
         print("==", key, flush=True)
         torch.manual_seed(seed)
         loaders = seg.get_loaders(cfg["size"], cfg["batch"])

@@ -102,3 +102,31 @@ def test_forecast_validates_input(values):
 
 def test_metrics_file_is_valid_json():
     json.loads((services.MODELS / "metrics.json").read_text())
+
+
+def test_waste_reports_a_verdict_and_a_heat_map():
+    body = client.post("/api/waste", files={"file": ("x.png", _png(), "image/png")}).json()
+    assert body["status"] in {"ok", "uncertain", "unknown"} and body["calibrated"] is True
+    assert body["cam"].startswith("data:image/png;base64,")
+    assert abs(sum(t["prob"] for t in body["top"]) - 1) < 0.2  # top-5 of a distribution
+
+
+def test_waste_heat_map_can_be_switched_off():
+    body = client.post("/api/waste?explain=false", files={"file": ("x.png", _png(), "image/png")}).json()
+    assert body["cam"] is None
+
+
+@pytest.mark.skipif(not EXAMPLES.exists(), reason="example images missing")
+def test_a_cat_photo_is_not_confidently_called_waste():
+    example = sorted(EXAMPLES.glob("pet_*.jpg"))[0]
+    body = client.post("/api/waste", files={"file": (example.name, example.read_bytes(), "image/jpeg")}).json()
+    assert body["status"] in {"unknown", "uncertain"}  # the classifier must not claim a pet is plain waste
+
+
+def test_sentiment_returns_word_importance_that_points_the_right_way():
+    r = client.post(
+        "/api/sentiment", json={"text": "A wonderful, moving film with brilliant acting.", "model": "lstm"}
+    ).json()
+    words = {w["t"]: w["s"] for w in r["words"]}
+    assert "wonderful" in words and words["wonderful"] > 0  # removing a praising word lowers "positive"
+    assert r["words"][0]["t"] == "a"

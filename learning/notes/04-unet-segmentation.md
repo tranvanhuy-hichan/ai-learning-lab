@@ -55,3 +55,17 @@
 - Lớp `border` mỏng mới là điểm nghẽn thật; mIoU cho thấy điều này rõ hơn pixel accuracy.
 - Mô hình thứ hai đổi nhiều thứ cùng lúc (encoder pretrained, 256 px, trọng số viền 3, ít epoch hơn và learning rate khác). Mình không thể quy mức +0,042 cho riêng thứ nào. Ablation đúng cách nằm trong [lộ trình](../ROADMAP.md).
 - Điểm số phụ thuộc *đo ở đâu*: ở độ phân giải gốc trên 400 ảnh test ngẫu nhiên, hai mô hình đạt 0,733 và 0,772.
+
+
+## Measured follow-up / Kết quả kiểm chứng (2026-11-17)
+
+The completed [Kaggle experiment](../../projects/model-study/results/REPORT.md) gives
+76.827% mean mIoU for scratch U-Net and 77.832% for the ResNet18-encoder variant (2 seeds each).
+The next recipe reaches 78.541%, but changes both learning rate and epochs.
+Border weighting increases mean border IoU from 56.873% to 57.471%, while mean mIoU falls to 78.240%.
+The 256 px run reaches 80.632% mIoU (one seed); batch size and evaluation resolution change too.
+This does not isolate the effect of resolution alone.
+
+Thí nghiệm cho thấy trọng số viền có đánh đổi: IoU viền tăng nhưng mIoU giảm nhẹ.
+Không thể quy toàn bộ chênh lệch ở các bước sau cho learning rate hoặc độ phân giải,
+vì cấu hình cũ đổi thêm số epoch và batch size. Ablation đã sửa trong code cần chạy lại.

@@ -188,3 +188,19 @@ textarea:focus { border-color: var(--accent); outline: none; }
   .demo { padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- camera ---------- */
+.camera-modal { width: min(640px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 20px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); overflow: auto; }
+.camera-modal::backdrop { background: rgb(0 0 0 / 70%); }
+.camera-box { font-family: var(--sans); }
+.camera-box video { display: block; width: 100%; max-height: 65dvh; background: #111; object-fit: contain; }
+.camera-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+.study-scroll { overflow-x: auto; }
+.study-table { min-width: 540px; }
+.study-table caption { text-align: left; font-weight: 600; color: var(--ink); padding-bottom: 8px; }
+.study-table td, .study-table th { white-space: nowrap; }
+.study-table td:nth-child(n+2) { font-family: var(--mono); font-size: 13px; }
+@media (max-width: 720px) {
+  .study-table td:nth-child(4), .study-table th:nth-child(4) { display: table-cell; }
+}

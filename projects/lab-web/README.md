@@ -14,6 +14,10 @@
 | Review sentiment | BiLSTM, DistilBERT | Type an English review and compare an LSTM with a Transformer |
 | Temperature forecast | RNN, LSTM | Pick a 30-day window and compare forecasts with baselines and the real value |
 
+The image tools have a **Take a photo** button with live preview. Camera access requires HTTPS or localhost and browser permission. The camera stops when the dialog closes or you leave the page; file upload remains available.
+
+The Experiments section reads generated `static/study-results.json` and shows Kaggle ablations, compression and the IMDB baseline alongside their seed counts and limits. These measurements do not replace the installed inference models.
+
 Each tool also shows "what I learned" and the real test metrics of its model. The page switches between **English and Vietnamese** (it follows your browser at first) and between **light and dark** themes.
 
 ## Run it

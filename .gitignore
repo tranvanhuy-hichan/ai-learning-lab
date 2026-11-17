@@ -17,3 +17,5 @@ projects/model-study/results/seg_runs/
 projects/model-study/results/*.log
 projects/model-study/results/*.shard*.json
 projects/model-study/results/ablation_local_partial.json
+
+projects/model-study/results/downloads/

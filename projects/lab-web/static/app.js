@@ -6,6 +6,35 @@ const REPO = "https://github.com/tranvanhuy-hichan/ai-learning-lab";
 /* ----------------------------------------------------------------- translations */
 const I18N = {
   en: {
+    "waste.unknown": "Outside the supported waste categories / cannot identify",
+    "waste.uncertain": "Not confident enough to classify",
+    "waste.rejectNote": "The model cannot reliably classify this image as waste. Scores below only compare its 12 known classes; they do not confirm the object is waste.",
+    "waste.uncertainNote": "The model is unsure. Try a clear photo of a single waste item.",
+    "study.nav": "Experiments",
+    "study.title": "Measured experiments",
+    "study.desc": "Kaggle training results and a local IMDB baseline. These are separate experiments; the interactive tools above keep their installed models.",
+    "study.stats": "Mean ± sample standard deviation in percentage points. n is the number of seeds; a single run has no estimated spread.",
+    "study.report": "Full report and limitations",
+    "study.waste": "Waste classification ablation",
+    "study.seg": "Segmentation: historical recipe",
+    "study.imdb": "IMDB comparison",
+    "study.compression": "Post-training compression (one run each)",
+    "study.model": "Variant / model",
+    "study.score": "Accuracy (%)",
+    "study.miou": "mIoU (%)",
+    "study.border": "Border IoU (%)",
+    "study.size": "File MB",
+    "study.seeds": "n",
+    "study.segNote": "B→C changes learning rate AND epochs. D→E changes resolution AND batch size; E has only one seed and uses a different evaluation resolution. Border weighting improves border IoU while reducing mIoU in these runs.",
+    "study.compressionNote": "INT8 loses substantial accuracy. Pruned checkpoints retain dense shapes; file size does not measure inference speed. CPU latency is not measured.",
+    "study.error": "Experiment tables could not be loaded.",
+    "camera.open": "Take a photo",
+    "camera.title": "Camera",
+    "camera.shoot": "Capture",
+    "camera.cancel": "Cancel",
+    "camera.unavailable": "Camera needs HTTPS or localhost and a supported browser. You can still upload a photo.",
+    "camera.error": "Cannot open camera. Check camera permissions and whether another app is using it.",
+    "camera.captureError": "Could not capture a photo. Please try again.",
     "hero.badge": "Learning in public",
     "hero.title": "What I am learning about AI, and the models I built to test it",
     "hero.lead": "I study from courses and books, write a short note, then train and measure a model to see whether I really understood. Each section below runs one of those models on your own input.",
@@ -77,6 +106,35 @@ const I18N = {
     "err.net": "Cannot reach the server.", "err.generic": "Something went wrong",
   },
   vi: {
+    "waste.unknown": "Ngoài các nhóm rác hỗ trợ / không xác định được",
+    "waste.uncertain": "Chưa đủ tin cậy để phân loại",
+    "waste.rejectNote": "Mô hình không thể phân loại ảnh này là rác một cách đáng tin cậy. Các điểm bên dưới chỉ so sánh 12 lớp đã học, không xác nhận vật thể là rác.",
+    "waste.uncertainNote": "Mô hình chưa chắc chắn. Hãy thử ảnh rõ của một món rác riêng lẻ.",
+    "study.nav": "Thí nghiệm",
+    "study.title": "Kết quả thí nghiệm",
+    "study.desc": "Kết quả huấn luyện trên Kaggle và baseline IMDB chạy cục bộ. Đây là các thí nghiệm riêng; các công cụ phía trên dùng mô hình đang được cài.",
+    "study.stats": "Trung bình ± độ lệch chuẩn mẫu, theo điểm phần trăm. n là số seed; một lượt chạy chưa có ước lượng độ dao động.",
+    "study.report": "Báo cáo đầy đủ và giới hạn",
+    "study.waste": "Ablation phân loại rác",
+    "study.seg": "Phân đoạn: cấu hình cũ",
+    "study.imdb": "So sánh IMDB",
+    "study.compression": "Nén sau huấn luyện (mỗi phương pháp một lượt)",
+    "study.model": "Biến thể / mô hình",
+    "study.score": "Accuracy (%)",
+    "study.miou": "mIoU (%)",
+    "study.border": "IoU viền (%)",
+    "study.size": "Dung lượng MB",
+    "study.seeds": "n",
+    "study.segNote": "B→C đổi cả learning rate VÀ số epoch. D→E đổi cả độ phân giải VÀ batch size; E chỉ có một seed và đánh giá ở độ phân giải khác. Tăng trọng số viền giúp IoU viền tăng nhưng mIoU giảm trong các lượt này.",
+    "study.compressionNote": "INT8 làm giảm mạnh accuracy. Checkpoint sau pruning vẫn có tensor cùng kích thước; dung lượng tệp không thể hiện tốc độ suy luận. Chưa đo độ trễ CPU.",
+    "study.error": "Không tải được bảng thí nghiệm.",
+    "camera.open": "Chụp ảnh",
+    "camera.title": "Camera",
+    "camera.shoot": "Chụp",
+    "camera.cancel": "Hủy",
+    "camera.unavailable": "Camera cần HTTPS hoặc localhost và trình duyệt hỗ trợ. Bạn vẫn có thể tải ảnh lên.",
+    "camera.error": "Không mở được camera. Hãy kiểm tra quyền truy cập và ứng dụng khác đang dùng camera.",
+    "camera.captureError": "Không chụp được ảnh. Hãy thử lại.",
     "hero.badge": "Học công khai",
     "hero.title": "Mình đang học gì về AI, và các mô hình mình xây để kiểm chứng",
     "hero.lead": "Mình học từ môn học và sách, viết một ghi chú ngắn, rồi huấn luyện và đo một mô hình để xem mình đã thật sự hiểu chưa. Mỗi phần bên dưới chạy một mô hình như vậy trên dữ liệu của chính bạn.",
@@ -173,7 +231,7 @@ const store = {
 const state = {
   lang: store.get("lang") || ((navigator.language || "").toLowerCase().startsWith("vi") ? "vi" : "en"),
   theme: store.get("theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"),
-  models: null, waste: null, seg: { file: null, model: null, res: null, img: null, mask: null },
+  study: null, models: null, waste: null, seg: { file: null, model: null, res: null, img: null, mask: null },
   sent: { results: null }, fc: { samples: [], idx: 0, values: null, actual: null, preds: null },
 };
 const t = (key) => (I18N[state.lang] && I18N[state.lang][key]) || I18N.en[key] || key;
@@ -231,6 +289,64 @@ function setupDrop(drop, input, onFile) {
 }
 const loadImage = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
 
+/* ----------------------------------------------------------------- camera */
+function setupCamera() {
+  const modal = $("#camera-modal"), video = $("#camera-video");
+  const shoot = $("#camera-shoot");
+  let stream = null, target = null, opener = null, request = 0;
+  function close() {
+    request++;
+    if (stream) stream.getTracks().forEach((track) => track.stop());
+    stream = null; video.srcObject = null; target = null;
+    modal.close();
+    if (opener) opener.focus();
+  }
+  async function open(button, onFile) {
+    opener = button; target = onFile;
+    const token = ++request;
+    showMsg("#camera-msg", ""); shoot.disabled = true;
+    modal.showModal(); $("#camera-close").focus();
+    if (!navigator.mediaDevices?.getUserMedia) {
+      showMsg("#camera-msg", t("camera.unavailable")); return;
+    }
+    try {
+      const incoming = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false,
+      });
+      if (token !== request) { incoming.getTracks().forEach((track) => track.stop()); return; }
+      stream = incoming; video.srcObject = stream;
+      await video.play();
+      if (token === request) shoot.disabled = false;
+    } catch {
+      if (token !== request) return;
+      if (stream) stream.getTracks().forEach((track) => track.stop());
+      stream = null; video.srcObject = null;
+      showMsg("#camera-msg", t("camera.error"));
+    }
+  }
+  [[$("#waste-camera-open"), runWaste], [$("#seg-camera-open"), runSeg]].forEach(([button, handler]) => {
+    button.addEventListener("click", () => open(button, handler));
+  });
+  $("#camera-close").addEventListener("click", close);
+  modal.addEventListener("cancel", (event) => { event.preventDefault(); close(); });
+  modal.addEventListener("click", (event) => { if (event.target === modal) close(); });
+  window.addEventListener("pagehide", close);
+  document.addEventListener("visibilitychange", () => { if (document.hidden && modal.open) close(); });
+  shoot.addEventListener("click", () => {
+    if (!video.videoWidth || !video.videoHeight || !target) return;
+    const canvas = $("#camera-canvas"), handler = target, token = request;
+    const scale = Math.min(1, 1600 / Math.max(video.videoWidth, video.videoHeight));
+    canvas.width = Math.round(video.videoWidth * scale); canvas.height = Math.round(video.videoHeight * scale);
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    shoot.disabled = true;
+    canvas.toBlob((blob) => {
+      if (token !== request) return;
+      if (!blob) { shoot.disabled = false; showMsg("#camera-msg", t("camera.captureError")); return; }
+      close(); handler(new File([blob], "camera.jpg", { type: "image/jpeg" }));
+    }, "image/jpeg", 0.9);
+  });
+}
+
 /* ----------------------------------------------------------------- stats & facts */
 function fact(label, value) { return h("span", {}, `${label} `, h("b", {}, value)); }
 function renderStats() {
@@ -254,8 +370,12 @@ function renderWaste() {
   const r = state.waste;
   if (!r) return;
   $("#waste-out").hidden = false;
-  $("#waste-label").textContent = wasteName(r.label);
+  const rejected = r.status === "unknown" || r.status === "uncertain";
+  $("#waste-label").textContent = rejected ? t("waste." + r.status) : wasteName(r.label);
+  $("#waste-pct").hidden = rejected;
   $("#waste-pct").textContent = pct(r.top[0].prob, 1);
+  $("#waste-tip").closest(".tip").hidden = rejected;
+  showMsg("#waste-verdict-msg", rejected ? t(r.status === "unknown" ? "waste.rejectNote" : "waste.uncertainNote") : "", true);
   $("#waste-tip").textContent = r.tip[state.lang] || r.tip.en;
   renderBars($("#waste-bars"), r.top.map((x, i) => ({ name: wasteName(x.label), value: x.prob, text: pct(x.prob, 1), top: i === 0 })));
 }
@@ -410,6 +530,30 @@ function parseCustom() {
 }
 
 /* ----------------------------------------------------------------- chrome: language, theme, tabs */
+function renderStudy() {
+  const box = $("#study-tables"), data = state.study;
+  if (!data) return;
+  box.replaceChildren();
+  const score = (row) => `${(row.mean * 100).toFixed(3)}${row.std == null ? "" : ` ± ${(row.std * 100).toFixed(3)}`}`;
+  function table(title, headers, rows, note) {
+    const el = h("table", { class: "results study-table" },
+      h("caption", {}, t(title)),
+      h("thead", {}, h("tr", {}, headers.map((key) => h("th", { scope: "col" }, t(key))))),
+      h("tbody", {}, rows.map((row) => h("tr", {}, row.map((value) => h("td", {}, String(value)))))));
+    box.append(h("div", { class: "study-scroll", tabindex: "0" }, el));
+    if (note) box.append(h("p", { class: "caption" }, t(note)));
+  }
+  table("study.waste", ["study.model", "study.score", "study.seeds"],
+    ["baseline", "label_smoothing", "cutmix", "epochs20", "size192"].map((name) => [name, score(data.waste[name]), data.waste[name].n]));
+  table("study.seg", ["study.model", "study.miou", "study.border", "study.seeds"],
+    ["A_scratch", "B_pretrained_encoder", "C_recipe", "D_border_weight", "E_256px"].map((name) =>
+      [name, score(data.segmentation[name]), score(data.border[name]), data.segmentation[name].n]), "study.segNote");
+  table("study.imdb", ["study.model", "study.score", "study.seeds"],
+    Object.entries(data.imdb).map(([name, row]) => [name, score(row), row.n]));
+  table("study.compression", ["study.model", "study.score", "study.size"],
+    Object.entries(data.compression).map(([name, row]) => [name, (row.test_acc * 100).toFixed(3), row.size_mb.toFixed(3)]), "study.compressionNote");
+}
+
 function applyI18n() {
   document.documentElement.lang = state.lang;
   document.title = state.lang === "vi" ? "AI Learning Lab · Học và thử AI" : "AI Learning Lab · Learn and try AI";
@@ -418,13 +562,14 @@ function applyI18n() {
   $$("[data-i18n-title]").forEach((el) => { el.title = t(el.dataset.i18nTitle); });
   $$("#lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)));
   $$("[data-repo]").forEach((a) => { a.href = REPO + a.dataset.repo; });
-  renderStats(); renderSentExamples(); renderSegModels(); renderSeg(); renderWaste(); renderSent(); renderFcSamples(); renderForecast();
+  renderStudy(); renderStats(); renderSentExamples(); renderSegModels(); renderSeg(); renderWaste(); renderSent(); renderFcSamples(); renderForecast();
   if ($("#sent-go") && !$("#sent-go").disabled) $("#sent-go").textContent = t("sent.go");
 }
 async function init() {
   document.documentElement.dataset.theme = state.theme;
   $$("#lang button").forEach((b) => b.addEventListener("click", () => { state.lang = b.dataset.lang; store.set("lang", state.lang); applyI18n(); }));
   $("#theme").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; store.set("theme", state.theme); document.documentElement.dataset.theme = state.theme; });
+  setupCamera();
   setupDrop($("#waste-drop"), $("#waste-file"), runWaste);
   setupDrop($("#seg-drop"), $("#seg-file"), runSeg);
   $("#seg-opacity").addEventListener("input", drawSeg);
@@ -433,6 +578,8 @@ async function init() {
   $("#sent-text").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) runSent(); });
   $("#fc-custom-go").addEventListener("click", parseCustom);
   updateCount();
+  api("/study-results.json").then((data) => { state.study = data; renderStudy(); })
+    .catch(() => { $("#study-tables").textContent = t("study.error"); });
   applyI18n();
 
   try { state.models = await api("/api/models"); } catch (e) { ["#waste-msg", "#seg-msg", "#sent-msg", "#fc-msg"].forEach((id) => showMsg(id, e.message)); return; }

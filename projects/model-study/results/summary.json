@@ -1,0 +1,180 @@
+{
+  "waste": {
+    "baseline": {
+      "mean": 0.9599083662033081,
+      "std": 0.002365800611139118,
+      "n": 3
+    },
+    "cutmix": {
+      "mean": 0.9623425006866455,
+      "std": 0.0028600852411861714,
+      "n": 3
+    },
+    "size192": {
+      "mean": 0.9702176253000895,
+      "std": 0.0015085432281002108,
+      "n": 3
+    },
+    "label_smoothing": {
+      "mean": 0.9639175335566202,
+      "std": 0.0011365033836630086,
+      "n": 3
+    },
+    "epochs20": {
+      "mean": 0.9630584120750427,
+      "std": 0.0,
+      "n": 3
+    }
+  },
+  "students": {
+    "cnn_scratch": {
+      "mean": 0.8248854676882426,
+      "std": 0.006741834300662578,
+      "n": 3
+    },
+    "mnv3_ce": {
+      "mean": 0.9405784606933594,
+      "std": 0.0019369511345360675,
+      "n": 3
+    },
+    "cnn_kd": {
+      "mean": 0.8782932360967001,
+      "std": 0.002029981418002932,
+      "n": 3
+    },
+    "mnv3_kd": {
+      "mean": 0.9445876479148865,
+      "std": 0.0012886524200439453,
+      "n": 3
+    }
+  },
+  "segmentation": {
+    "E_256px": {
+      "mean": 0.8063211475106394,
+      "std": null,
+      "n": 1
+    },
+    "B_pretrained_encoder": {
+      "mean": 0.7783171009418,
+      "std": 0.0009549808267009138,
+      "n": 2
+    },
+    "D_border_weight": {
+      "mean": 0.7824002265750142,
+      "std": 0.0007469789388713345,
+      "n": 2
+    },
+    "A_scratch": {
+      "mean": 0.7682678289542768,
+      "std": 0.0016337068558233455,
+      "n": 2
+    },
+    "C_recipe": {
+      "mean": 0.7854074834358598,
+      "std": 0.00020543314466321837,
+      "n": 2
+    }
+  },
+  "border": {
+    "E_256px": {
+      "mean": 0.6133743022809002,
+      "std": null,
+      "n": 1
+    },
+    "B_pretrained_encoder": {
+      "mean": 0.5591057562395005,
+      "std": 0.001997561663976124,
+      "n": 2
+    },
+    "D_border_weight": {
+      "mean": 0.5747118685572912,
+      "std": 0.0013873033079151464,
+      "n": 2
+    },
+    "A_scratch": {
+      "mean": 0.5521992558010573,
+      "std": 0.0022546207839866435,
+      "n": 2
+    },
+    "C_recipe": {
+      "mean": 0.5687297780840426,
+      "std": 0.00016601029280300937,
+      "n": 2
+    }
+  },
+  "compression": {
+    "onnx_fp32": {
+      "test_acc": 0.9630584120750427,
+      "macro_f1": 0.952631486303746,
+      "size_mb": 16.081677,
+      "path": "results/compressed/teacher_fp32.onnx"
+    },
+    "onnx_int8": {
+      "test_acc": 0.6417526006698608,
+      "macro_f1": 0.5978667748490115,
+      "size_mb": 4.901646,
+      "path": "results/compressed/teacher_int8.onnx"
+    },
+    "prune_30": {
+      "amount": 0.3,
+      "sparsity": 0.3000001007162943,
+      "test_acc": 0.9609106779098511,
+      "size_mb": 16.390429,
+      "gzip_mb": 11.920102,
+      "path": "results/compressed/prune_30.pt"
+    },
+    "prune_50": {
+      "amount": 0.5,
+      "sparsity": 0.5,
+      "test_acc": 0.9630584120750427,
+      "size_mb": 16.390429,
+      "gzip_mb": 9.352324,
+      "path": "results/compressed/prune_50.pt"
+    },
+    "prune_70": {
+      "amount": 0.7,
+      "sparsity": 0.6999998992837058,
+      "test_acc": 0.9523195624351501,
+      "size_mb": 16.390429,
+      "gzip_mb": 6.572698,
+      "path": "results/compressed/prune_70.pt"
+    },
+    "prune_90": {
+      "amount": 0.9,
+      "sparsity": 0.9000000503581471,
+      "test_acc": 0.4613402187824249,
+      "size_mb": 16.390429,
+      "gzip_mb": 3.383542,
+      "path": "results/compressed/prune_90.pt"
+    }
+  },
+  "teacher": {
+    "variant": "epochs20",
+    "weights": "results/runs/weights/epochs20_s0.pt",
+    "params": 4022920,
+    "size_mb": 16.391527,
+    "gzip_mb": 15.130122
+  },
+  "imdb": {
+    "BiLSTM": {
+      "mean": 0.8766,
+      "n": 1,
+      "std": null
+    },
+    "TF-IDF + Logistic Regression": {
+      "mean": 0.90552,
+      "n": 1,
+      "std": null
+    },
+    "TF-IDF + Linear SVM": {
+      "mean": 0.90356,
+      "n": 1,
+      "std": null
+    },
+    "DistilBERT": {
+      "mean": 0.91592,
+      "n": 1,
+      "std": null
+    }
+  }
+}

@@ -41,15 +41,25 @@ TIPS_VI = {
 
 
 # ------------------------------------------------------------------ vision
-def classify_waste(image) -> dict:
+def classify_waste(image, explain: bool = True) -> dict:
+    """Calibrated top-5, a verdict (ok / uncertain / unknown) and optionally a Grad-CAM overlay (PIL image)."""
     with _lock:
-        probs = vision.predict_waste(image)
-    ranked = sorted(probs.items(), key=lambda kv: kv[1], reverse=True)
+        a = vision.analyze_waste(image, explain=explain)
+    ranked = sorted(a["probs"].items(), key=lambda kv: kv[1], reverse=True)
     top = ranked[0][0]
+    cam = None
+    if a["cam"] is not None:
+        from vision_toolkit.explain import overlay
+
+        cam = overlay(image.convert("RGB"), a["cam"])
     return {
         "label": top,
+        "status": a["status"],
         "top": [{"label": k, "prob": round(v, 4)} for k, v in ranked[:5]],
         "tip": {"en": vision.RECYCLING_TIPS[top], "vi": TIPS_VI[top]},
+        "calibrated": vision.waste_calibration() is not None,
+        "temperature": round(a["temperature"], 3),
+        "cam": cam,
     }
 
 
@@ -99,26 +109,63 @@ def sentiment_models() -> list[str]:
     return out
 
 
+MAX_EXPLAIN = {"lstm": 80, "distilbert": 50}  # how many leading words get an importance score
+
+
+def _lstm_probs(variants: list[list[int]]) -> torch.Tensor:
+    m, _ = _lstm()
+    lengths = torch.tensor([len(v) for v in variants])
+    ids = torch.zeros(len(variants), int(lengths.max()), dtype=torch.long)
+    for i, v in enumerate(variants):
+        ids[i, : len(v)] = torch.tensor(v)
+    return m(ids.to(DEVICE), lengths).softmax(1).cpu()
+
+
+def _occlusion(base_p: float, variant_p: torch.Tensor, words: list[str]) -> list[dict]:
+    """Leave-one-out importance: how much the probability of the predicted class falls without each word."""
+    return [{"t": w, "s": round(base_p - float(p), 4)} for w, p in zip(words, variant_p, strict=True)]
+
+
 @torch.no_grad()
-def sentiment(text: str, model: str) -> dict:
+def sentiment(text: str, model: str, explain: bool = True) -> dict:
+    words: list[dict] = []
     with _lock:
         if model == "distilbert":
             m, tok = _distilbert()
             enc = tok(text, truncation=True, max_length=256, return_tensors="pt").to(DEVICE)
             p = m(**enc).logits.softmax(1)[0].cpu()
             used, truncated = int(enc["input_ids"].shape[1]), bool(len(tok.tokenize(text)) + 2 > 256)
+            if explain:
+                label = int(p.argmax())
+                toks = text.split()[: MAX_EXPLAIN["distilbert"]]
+                texts = [
+                    " ".join(toks[:i] + toks[i + 1 :] + text.split()[len(toks) :]) or "." for i in range(len(toks))
+                ]
+                out = []
+                for i in range(0, len(texts), 16):
+                    e = tok(texts[i : i + 16], truncation=True, max_length=256, padding=True, return_tensors="pt").to(
+                        DEVICE
+                    )
+                    out.append(m(**e).logits.softmax(1)[:, label].cpu())
+                words = _occlusion(float(p[label]), torch.cat(out), toks) if texts else []
         else:
             m, stoi = _lstm()
             tokens = T.tokenize(text)
-            ids = torch.tensor([T.encode(tokens, stoi, 400)])
-            p = m(ids.to(DEVICE), torch.tensor([ids.shape[1]])).softmax(1)[0].cpu()
-            used, truncated = int(ids.shape[1]), len(tokens) > 400
+            full = T.encode(tokens, stoi, 400)
+            p = _lstm_probs([full])[0]
+            used, truncated = len(full), len(tokens) > 400
+            if explain and len(tokens) > 0:
+                label = int(p.argmax())
+                n = min(len(full), MAX_EXPLAIN["lstm"])
+                variants = [full[:i] + full[i + 1 :] or [1] for i in range(n)]
+                words = _occlusion(float(p[label]), _lstm_probs(variants)[:, label], tokens[:n])
     return {
         "model": model,
         "label": "positive" if p[1] >= p[0] else "negative",
         "probs": {"negative": round(float(p[0]), 4), "positive": round(float(p[1]), 4)},
         "tokens_used": used,
         "truncated": truncated,
+        "words": words,
     }
 
 
